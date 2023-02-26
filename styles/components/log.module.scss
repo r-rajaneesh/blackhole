@@ -3,7 +3,7 @@
   border-radius: 10px;
   margin: 15px;
   padding: 5px;
-  width: max-content;
+  width: 40rem;
   background-color: rgb(109, 109, 109);
   thead {
     tr {
@@ -48,13 +48,28 @@
 
           color: rgb(255, 255, 255);
         }
+        button {
+         
+          background-color: rgba(0, 200, 57);
+          border-radius: 5px;
+          border-width: 0px;
+          padding: 5px;
+          width: max-content;
+        }
       }
       &.allowed {
         td {
-          border-radius: 5px;
+          border-radius: 2px;
           padding: 15px;
           background-color: rgba(0, 200, 57);
           color: rgb(255, 255, 255);
+        }
+        button {
+          background-color: rgb(253, 73, 73);
+          border-radius: 2px;
+          border-width: 0px;
+          padding: 5px;
+          width: max-content;
         }
       }
       &.question {
@@ -68,13 +83,6 @@
       td {
         border-radius: 5px;
         padding: 15px;
-      }
-      button {
-        background-color: rgb(66, 66, 66);
-        border-radius: 5px;
-        border-width: 0px;
-        padding: 5px;
-        width: max-content;
       }
     }
   }

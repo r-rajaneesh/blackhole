@@ -51,7 +51,11 @@ export default function Logs() {
   React.useEffect(() => {
     socket.on("dns-query", (res) => {
       res.answers.push(...res.questions);
-      res.answers.forEach((d: response) => {
+      const queries: response[] = [];
+      res.answers.forEach((a: response) => {
+        if (queries.find((q) => q.domain !== a.domain)) queries.push(a);
+      });
+      queries.forEach((d: response) => {
         const log = document.createElement("tr");
 
         const domain = document.createElement("td");

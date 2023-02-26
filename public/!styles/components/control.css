@@ -1,0 +1,42 @@
+.ad-control {
+  font-family: "gg-sans";
+  display:grid;
+  grid: "live-list" 2rem
+        "ad-control" 10rem;
+  
+  color: white;
+  margin:40px;
+}
+.ad-control input#ad-control-text {
+  color: white;
+  height: 2rem;
+  width: 25rem;
+  border-width: 0;
+  border-radius: 5px;
+  background-color: rgb(55, 55, 55);
+}
+.ad-control input#ad-control-text:active {
+  color: white;
+  border-width: 0;
+  border-radius: 5px;
+  background-color: rgb(78, 78, 78);
+}
+
+.ad-control .buttons button {
+  margin:20px;
+  height: 2rem;
+  width: 4rem;
+}
+
+.ad-control .buttons button.block {
+  color: white;
+  border-width: 0;
+  border-radius: 5px;
+  background-color: rgb(255, 0, 0);
+}
+.ad-control .buttons button.unblock {
+  color: white;
+  border-width: 0;
+  border-radius: 5px;
+  background-color: rgb(0, 183, 0);
+}

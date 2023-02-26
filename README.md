@@ -8,7 +8,7 @@ Blackhole is a DNS server running on your local machine that sucks up all your a
 
 [✅] **Add a way to view live DNS queries**
 
-[❌] **Add a way to allow blocking ads seperately and from a list**
+[✅] **Add a way to allow blocking ads seperately and from a list**
 
 [❌] **Add login page**
 
@@ -29,27 +29,9 @@ install.bat
 
 ## Running the server
 
-### In Development
 ```
 npm run start
 ```
-
-### In Production
-```js
-// server.ts
-
-// Comment line 20 and uncomment line 21
-
-/* LINE 20 */
-const dev = process.env.NODE_ENV !== "production";
-
-/* LINE 21 */
-const dev = false;
-```
-```
-npm run start
-```
-
 
 ## Author
 

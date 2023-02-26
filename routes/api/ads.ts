@@ -29,11 +29,6 @@ router.post("/updatetype", async (req, res) => {
 
     sql.prepare(`UPDATE gravity SET type = (?) WHERE domain = (?)`).run(body.type, `${body?.domain}`);
 
-    try {
-      await axios.post("http://127.0.0.1/api/refreshgravity");
-    } catch (error) {
-      console.log(error);
-    }
     res.status(200).json({ message: "SUCCESS", status: 200, data: { domain: `${body?.domain}`, type: body?.type ? "Allowed" : "Blocked" } });
   } catch (error) {
     res.status(400).json({ message: "FAILED", status: 400, data: undefined });
@@ -174,11 +169,6 @@ router.delete("/reset", async (req, res) => {
     setTimeout(async () => {
       insertMany(adsList);
       res.status(200).json({ message: "SUCCESS", status: 200, data: undefined });
-      try {
-        await axios.post("http://127.0.0.1/api/refreshgravity");
-      } catch (error) {
-        console.log(error);
-      }
     }, 10000);
   } catch (error) {
     console.log(error);
