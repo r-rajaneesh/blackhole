@@ -1,59 +1,29 @@
 import * as glob from "globby";
 import * as socket from "socket.io";
 import apiRouter from "./routes/api/ads.js";
-import axios from "axios";
 import cors from "cors";
-import dgram from "dgram";
 import dns2 from "dns2";
 import express from "express";
 import fs from "fs-extra";
 import helmet from "helmet";
 import http from "http";
-import next from "next";
-import path from "path";
+import p from "path";
 import sql from "./routes/db.js";
 import url from "url";
+import axios from "axios";
 
-const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
+if (!sql.prepare(`SELECT * FROM gravity`).all().length) {
+  await axios({ method: "delete", url: "http://127.0.0.1:80/reset" });
+}
+
+const __dirname = p.dirname(url.fileURLToPath(import.meta.url));
 const { Packet } = dns2;
-const dev = process.env.NODE_ENV !== "production";
-// const dev = false;
-const hostname = "localhost";
-const port = 80;
 
-let ads: Map<string, { type: number; redirect: string }>;
-interface dbMapOptions {
-  domain: string;
-  type: number;
-  redirect: string;
-}
-try {
-  ads = new Map(
-    sql
-      .prepare(`SELECT * FROM gravity`)
-      .all()
-      .map((v: dbMapOptions) => [v.domain, { type: v.type, redirect: v.redirect }]),
-  );
-} catch (error) {
-  ads = new Map();
-}
-/* Run every 5 Mins */
-setInterval(() => {
-  ads = new Map(
-    sql
-      .prepare(`SELECT * FROM gravity`)
-      .all()
-      .map((v: dbMapOptions) => [v.domain, { type: v.type, redirect: v.redirect }]),
-  );
-}, 5 * 60 * 1000);
+const app = express();
+const server = http.createServer(app);
+const io = new socket.Server();
+io.attach(server);
 
-// * Next Server Initialiser
-const app = next({ port, hostname, dev });
-// * Web Server Initialiser
-const server = express();
-const frame = http.createServer(server);
-// * Socket.io Server Initialiser
-const io = new socket.Server(frame);
 // * DNS Initialiser
 const dns = dns2.createServer({
   udp: true,
@@ -65,7 +35,7 @@ const dns = dns2.createServer({
     const { name: domain } = question;
     question.type = Packet.TYPE.A;
     question.class = Packet.CLASS.IN;
-    async function blockDomain() {
+    async function blockDomain(ad: any) {
       const res: any = {
         domain: domain,
         name: domain,
@@ -73,21 +43,22 @@ const dns = dns2.createServer({
         ttl: 0,
         class: Packet.CLASS.IN,
         address: "0.0.0.0",
+        allowed: 0,
       };
       response.answers.push(res);
       io.emit("dns-query", response);
       // console.log(`Blocked domain ${domain}\n`);
       send(response);
     }
-    async function allowDomain() {
+    async function allowDomain(ad: any) {
       Promise.resolve(await new dns2().resolveA(domain)).then(async (res) => {
         res.answers.forEach(async (ans) => {
-          if (ads.has(ans.domain ?? ans.name)) {
-            const ad = ads.get(domain);
-            if (!ad?.type) {
-              ans.ttl = 0;
-              ans.address = "0.0.0.0";
-            }
+          if (!ad?.type) {
+            ans.ttl = 0;
+            ans.address = "0.0.0.0";
+            ans.allowed = 0;
+          } else {
+            ans.allowed = 1;
           }
         });
         response.answers = res.answers;
@@ -95,77 +66,61 @@ const dns = dns2.createServer({
         send(response);
       });
     }
-    if (ads.has(domain)) {
-      const ad = ads.get(domain);
-      if (ad?.type) {
-        allowDomain();
-      } else {
-        blockDomain();
-      }
+
+    const ad = sql.prepare(`SELECT * FROM gravity WHERE domain = (?)`).get(domain);
+    if (!ad) sql.prepare(`INSERT INTO gravity (type, domain, redirect) VALUES (?, ?, ?)`).run(1, domain, "0.0.0.0");
+    console.log(domain, sql.prepare(`SELECT * FROM gravity WHERE domain = (?)`).get(domain));
+    if (ad?.type) {
+      allowDomain(ad);
     } else {
-      allowDomain();
+      blockDomain(ad);
     }
   },
 });
 
-// * Web Server Handler
-server.set("trust proxy", 1);
-server.use(cors({ origin: "*", optionsSuccessStatus: 200 }));
-server.use(helmet());
-server.use(express.json());
-server.use(express.static(path.join(__dirname, "public")));
-server.use(async (req, res, next) => {
+app.set("view engine", "ejs");
+app.set("views", "src");
+app.set("trust proxy", 1);
+app.use(cors({ origin: "*", optionsSuccessStatus: 200 }));
+app.use(helmet());
+app.use(express.json());
+app.use(express.static(p.join(__dirname, "public")));
+app.use("/api", apiRouter);
+app.use(async (req, res, next) => {
   res.setHeader("x-powered-by", "blackhole");
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Content-Security-Policy", "");
 
   next();
 });
-const handle = app.getRequestHandler();
-server.use("/api", apiRouter);
 
-server.post("/api/refreshgravity", async (req, res) => {
-  try {
-    ads = new Map(
-      sql
-        .prepare(`SELECT * FROM gravity`)
-        .all()
-        .map((v: dbMapOptions) => [v.domain, { type: v.type, redirect: v.redirect }]),
-    );
-    res.status(200).json({ message: "SUCCESS", status: 200, data: undefined });
-  } catch (error) {
-    res.status(400).json({ message: "ERROR", status: 400, data: undefined });
-  }
-});
+glob.globby("src/**").then((paths) => {
+  paths.forEach(async (path) => {
+    /* Watch file changes */
+    fs.watchFile(path, (currentState, previousState) => {
+      io.emit("page-reload");
+    });
 
-server.use((req, res) => {
-  try {
-    const parsedUrl = url.parse(req.url, true);
-    const { pathname, query } = parsedUrl;
-    handle(req, res, parsedUrl);
-  } catch (error) {}
-});
-// Dynamic Pages
-// const paths = glob.globbySync("./src/pages/**").reverse();
+    /* Process file path and server file path destination */
+    if (!path || !path.length) return;
+    if (path.split("/")[1].startsWith("!")) return;
+    let serverPath = "";
+    let Path: string[] = path.split("/");
+    if (!Path.length) return;
+    if (/index.(ejs|html)/g.test(path.split("/").pop() as string)) Path.pop();
+    serverPath = `/${Path.join("/")}`;
+    serverPath = serverPath.replace("/src", "");
+    if (!serverPath.length) serverPath = "/";
 
-// paths.forEach(async (path) => {
-//   let p = path.replace("/index.html", "/").replace("./src/pages", "").replace(".html", "");
-
-//   if (p.includes("404")) p = "*";
-//   const file = Path.join(__dirname, ...path.replace("./", "").split("/"));
-
-//   server.get(p, async (req, res) => {
-//     res.status(200).sendFile(file);
-//   });
-// });
-
-// * Listeners
-app.prepare().then(() => {
-  frame.listen(port, () => {
-    console.log(` Ready on http://127.0.0.1:${port}`);
+    path = path.replace("src/", "");
+    console.log(serverPath, path);
+    app.get(serverPath, (req, res) => {
+      if (!path.endsWith(".html")) return res.render(path);
+      return res.sendFile(p.resolve(`src/${path}`));
+    });
   });
-  dns.listen({ tcp: 53, udp: 53 });
 });
+
 // * DNS Handler
 dns.on("request", (request, response, rinfo) => {});
 dns.on("requestError", (error) => {
@@ -173,7 +128,6 @@ dns.on("requestError", (error) => {
 });
 
 dns.on("listening", () => {
-  // console.log(dns.addresses());
   console.log(
     ` Listening to ${Object.keys(dns.addresses())
       .map((v) => v.toUpperCase())
@@ -183,4 +137,10 @@ dns.on("listening", () => {
 
 dns.on("close", () => {
   console.log("server closed");
+});
+
+/* Start the servers */
+server.listen(80, "0.0.0.0", () => {
+  dns.listen({ tcp: 53, udp: 53 });
+  console.log("Server running on http://127.0.0.1");
 });

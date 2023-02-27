@@ -12,3 +12,9 @@
 * Memory usage reduced from approx. above 700MB to approx. below 200MB.
 * Now has ability to block or unblock domains from input box.
 * Live DNS queries can be viewed from `/admin`
+
+
+# v0.0.3
+
+* Insert domains into the database, if the databse is freshly created
+* Remove all the nextjs related files
