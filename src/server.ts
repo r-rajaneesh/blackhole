@@ -1,6 +1,6 @@
 import * as glob from "globby";
 import * as socket from "socket.io";
-import apiRouter from "./routes/api/ads.js";
+import apiRouter from "./routes/ads.js";
 import cors from "cors";
 import dns2 from "dns2";
 import express from "express";
@@ -8,13 +8,72 @@ import fs from "fs-extra";
 import helmet from "helmet";
 import http from "http";
 import p from "path";
-import sql from "./routes/db.js";
+import sql from "./database/db.js";
 import url from "url";
 import axios from "axios";
 
+let adsBlocked = 0;
 if (!sql.prepare(`SELECT * FROM gravity`).all().length) {
   await axios({ method: "delete", url: "http://127.0.0.1:80/reset" });
 }
+sql.prepare(`CREATE TABLE IF NOT EXISTS gravity (type INTEGER PRIMARYKEY, domain TEXT UNIQUE, redirect text DEFAULT "0.0.0.0")`).run();
+sql.prepare(`CREATE TABLE IF NOT EXISTS counter (count INTEGER PRIMARY KEY)`).run();
+
+/* Handle Process Exit */
+[
+  "beforeExit",
+  "exit",
+  "rejectionHandled",
+  "uncaughtException",
+  "uncaughtExceptionMonitor",
+  "unhandledRejection",
+  "warning",
+  "SIGABRT",
+  "SIGALRM",
+  "SIGBUS",
+  "SIGCHLD",
+  "SIGCONT",
+  "SIGFPE",
+  "SIGHUP",
+  "SIGILL",
+  "SIGINT",
+  "SIGIO",
+  "SIGIOT",
+  "SIGKILL",
+  "SIGPIPE",
+  "SIGPOLL",
+  "SIGPROF",
+  "SIGPWR",
+  "SIGQUIT",
+  "SIGSEGV",
+  "SIGSTKFLT",
+  "SIGSTOP",
+  "SIGSYS",
+  "SIGTERM",
+  "SIGTRAP",
+  "SIGTSTP",
+  "SIGTTIN",
+  "SIGTTOU",
+  "SIGUNUSED",
+  "SIGURG",
+  "SIGUSR1",
+  "SIGUSR2",
+  "SIGVTALRM",
+  "SIGWINCH",
+  "SIGXCPU",
+  "SIGXFSZ",
+  "SIGBREAK",
+  "SIGLOST",
+  "SIGINFO",
+].forEach((eventName: string) => {
+  process.on(eventName, () => {
+    process.stdin.resume();
+    sql.prepare(`UPDATE counter SET count = (count + ?)`).run(adsBlocked);
+    setTimeout(() => {
+      process.exit(1);
+    }, 2000);
+  });
+});
 
 const __dirname = p.dirname(url.fileURLToPath(import.meta.url));
 const { Packet } = dns2;
@@ -47,24 +106,33 @@ const dns = dns2.createServer({
       };
       response.answers.push(res);
       io.emit("dns-query", response);
+      const count = sql.prepare("SELECT * FROM counter").all();
+      if (!count.length) {
+        sql.prepare(`INSERT INTO counter (count) VALUES (?)`).run(1);
+      } else {
+        adsBlocked += 1;
+      }
       // console.log(`Blocked domain ${domain}\n`);
       send(response);
     }
     async function allowDomain(ad: any) {
-      Promise.resolve(await new dns2().resolveA(domain)).then(async (res) => {
-        res.answers.forEach(async (ans) => {
-          if (!ad?.type) {
-            ans.ttl = 0;
-            ans.address = "0.0.0.0";
-            ans.allowed = 0;
-          } else {
-            ans.allowed = 1;
-          }
-        });
-        response.answers = res.answers;
-        io.emit("dns-query", response);
-        send(response);
-      });
+      Promise.resolve(await new dns2().resolveA(domain))
+        .then(async (res) => {
+          res.answers.forEach(async (ans) => {
+            // console.log(ad);
+            if (ad?.type === 0) {
+              ans.ttl = 0;
+              ans.address = "0.0.0.0";
+              ans.allowed = false;
+            } else {
+              ans.allowed = true;
+            }
+          });
+          response.answers = res.answers;
+          io.emit("dns-query", response);
+          send(response);
+        })
+        .catch(() => {});
     }
 
     const ad = sql.prepare(`SELECT * FROM gravity WHERE domain = (?)`).get(domain);
@@ -79,12 +147,13 @@ const dns = dns2.createServer({
 });
 
 app.set("view engine", "ejs");
-app.set("views", "src");
 app.set("trust proxy", 1);
+app.set("views", "src/views");
 app.use(cors({ origin: "*", optionsSuccessStatus: 200 }));
 app.use(helmet());
 app.use(express.json());
 app.use(express.static(p.join(__dirname, "public")));
+app.use(express.static(p.join(__dirname, "source")));
 app.use("/api", apiRouter);
 app.use(async (req, res, next) => {
   res.setHeader("x-powered-by", "blackhole");
@@ -94,7 +163,7 @@ app.use(async (req, res, next) => {
   next();
 });
 
-glob.globby("src/**").then((paths) => {
+glob.globby("src/views/**").then((paths) => {
   paths.forEach(async (path) => {
     /* Watch file changes */
     fs.watchFile(path, (currentState, previousState) => {
@@ -103,20 +172,20 @@ glob.globby("src/**").then((paths) => {
 
     /* Process file path and server file path destination */
     if (!path || !path.length) return;
-    if (path.split("/")[1].startsWith("!")) return;
+    if (path.split("/")[2].startsWith("!")) return;
     let serverPath = "";
     let Path: string[] = path.split("/");
     if (!Path.length) return;
     if (/index.(ejs|html)/g.test(path.split("/").pop() as string)) Path.pop();
     serverPath = `/${Path.join("/")}`;
-    serverPath = serverPath.replace("/src", "");
+    serverPath = serverPath.replace("/src/views", "");
     if (!serverPath.length) serverPath = "/";
 
-    path = path.replace("src/", "");
+    path = path.replace("src/views/", "");
     console.log(serverPath, path);
     app.get(serverPath, (req, res) => {
       if (!path.endsWith(".html")) return res.render(path);
-      return res.sendFile(p.resolve(`src/${path}`));
+      return res.sendFile(p.resolve(`${path}`));
     });
   });
 });

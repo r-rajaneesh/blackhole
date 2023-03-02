@@ -11,9 +11,11 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "incremental": true,
-    "outDir": "./build/"
+    "incremental": false,
+    "outDir": "./build/",
   },
-  "include": ["**/*.ts", "test.ts", "routes/*", "public/*", "src/*"],
-  "exclude": ["node_modules"]
+  "buildOptions": { "verbose": false, "traceResolution": false, "dry": false },
+
+  "include": ["**/*.ts", "**/*.js", "**/*.ejs", "**/*.css", "**/*.jpg", "**/*.ico"],
+  "exclude": ["node_modules", "build.js"]
 }

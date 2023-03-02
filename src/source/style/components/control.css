@@ -1,11 +1,17 @@
+
 .ad-control {
-  font-family: "gg-sans";
-  display:grid;
-  grid: "live-list" 2rem
-        "ad-control" 10rem;
-  
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  display: grid;
+  grid:
+    "live-list" 2rem
+    "ad-control" 10rem;
+  background-color: rgba(55, 55, 55, 0.8);
+  border-radius: 5px;
+  padding: 20px;
+  height: 100px;
   color: white;
-  margin:40px;
+  justify-items: center;
+  margin: 40px;
 }
 .ad-control input#ad-control-text {
   color: white;
@@ -21,11 +27,14 @@
   border-radius: 5px;
   background-color: rgb(78, 78, 78);
 }
-
+.ad-control .buttons {
+  background-color: transparent;
+}
 .ad-control .buttons button {
-  margin:20px;
+  margin: 20px;
   height: 2rem;
   width: 4rem;
+  background-color: transparent;
 }
 
 .ad-control .buttons button.block {

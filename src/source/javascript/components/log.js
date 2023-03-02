@@ -47,6 +47,7 @@ socket.on("dns-query", (res) => {
     clas.append(CLASS[`${d.class}`]);
     const type = document.createElement("td");
     type.append(TYPE[`${d.type}`]);
+    const date = document.createElement("td");
 
     const toggle = document.createElement("td");
     toggle.id = d.domain ?? d.name;
@@ -63,9 +64,9 @@ socket.on("dns-query", (res) => {
       toggleButton.innerText = "Block";
     }
     toggleButton.id = "adstate";
-
+    date.innerText = new Date().toLocaleTimeString()
     toggle.append(toggleButton);
-    log.append(domain, clas, type, toggle);
+    log.append(date, domain, clas, type, toggle);
     document.getElementById("logs")?.prepend(log);
     $("#adstate").on("click", async function (ev) {
       ev.preventDefault();

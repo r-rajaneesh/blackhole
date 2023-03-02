@@ -1,5 +1,5 @@
 import express from "express";
-import sql from "../db.js";
+import sql from "../database/db.js";
 import axios from "axios";
 const router = express.Router();
 router.use(express.json());

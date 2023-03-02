@@ -1,10 +1,13 @@
-# v0.0.1
+# CHANGELOG - BLACKHOLE
+
+## v0.0.1
 
 * Initial commit for blackhole.
 * Uses nextjs.
 * Shows Live DNS queries.
 
-# v0.0.2
+
+## v0.0.2
 
 * Second release of blackhole.
 * Removed usage of nextjs and moved to ejs.
@@ -14,7 +17,15 @@
 * Live DNS queries can be viewed from `/admin`
 
 
-# v0.0.3
+## v0.0.3
 
 * Insert domains into the database, if the databse is freshly created
 * Remove all the nextjs related files
+
+
+## v0.0.4
+
+* Updated the file & folder structure for the entire project
+* Add a nice way to build the project inside the `/build` directory
+* Built version of blackhole now runs in less than 50MB after a minute or so
+![blackhole_performance_under 50MB_memory](./tmp/blackhole_performance.png)
