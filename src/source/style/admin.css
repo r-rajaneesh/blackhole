@@ -1,5 +1,17 @@
+
 .controls {
   display: flex;
   flex-direction: row;
   flex-flow: nowrap;
+}
+.controls .side-panel {
+  display: block;
+  justify-items: left;
+  min-width: 10rem;
+  /* margin-right: 90%; */
+
+  margin: 15px;
+}
+.controls .side-panel .live-panel {
+  min-width: 10rem;
 }

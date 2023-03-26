@@ -1,7 +1,3 @@
-const socket = io("ws://127.0.0.1:80");
-socket.on("page-reload", () => {
-  document.location.reload();
-});
 const TYPE = {
   1: "A",
   2: "NS",
@@ -36,44 +32,73 @@ const CLASS = {
   4: "HS",
   255: "ANY",
 };
+let row = 0;
 socket.on("dns-query", (res) => {
   res.answers.push(...res.questions);
-  [...new Set(res.answers)].forEach((d) => {
+  [...new Set(res.answers)].forEach((d, i) => {
+    row++;
     const log = document.createElement("tr");
 
     const domain = document.createElement("td");
     domain.append(d.domain ?? d.name);
+
     const clas = document.createElement("td");
     clas.append(CLASS[`${d.class}`]);
+
     const type = document.createElement("td");
     type.append(TYPE[`${d.type}`]);
-    const date = document.createElement("td");
 
+    const date = document.createElement("td");
     const toggle = document.createElement("td");
+
     toggle.id = d.domain ?? d.name;
     let toggleButton = document.createElement("button");
     // console.log(d);
     if (!d.address) log.classList.add("question");
     if (!d?.allowed) {
-      log.classList.add("blocked");
+      log.classList.add("table-danger");
       toggleButton.innerText = "Unblock";
       toggleButton.type = "1";
+      toggleButton.classList.add("btn", "btn-success");
     } else {
-      log.classList.add("allowed");
+      log.classList.add("table-success");
       toggleButton.type = "0";
       toggleButton.innerText = "Block";
+      toggleButton.classList.add("btn", "btn-danger");
     }
-    toggleButton.id = "adstate";
-    date.innerText = new Date().toLocaleTimeString()
+    toggleButton.id = `adstate`;
+    date.innerText = new Date().toLocaleTimeString();
     toggle.append(toggleButton);
     log.append(date, domain, clas, type, toggle);
-    document.getElementById("logs")?.prepend(log);
-    $("#adstate").on("click", async function (ev) {
-      ev.preventDefault();
-      const domain = $(this).parent().attr("id");
-      const type = $(this).attr("type") === "1" ? 1 : 0;
-      const data = (await axios.post("/api/updatetype", { domain: `${domain}`, type: type })).data.data;
-      alert(`${data.domain} has been ${data.type}`);
-    });
+    // if (row > 100) {
+    //   // Delete ad log at the end of the table if more that 100 ads are queried
+    //   const table = document.getElementById("logs");
+    //   table.deleteRow(table.rows.length - 1);
+    //   row--;
+    // }
+    // prepends ad log to the start of the table
+
+    setTimeout(() => {
+      document.getElementById("logs")?.prepend(log);
+      $(`#adstate`).on("click", async function (ev) {
+        ev.preventDefault();
+        const domain = $(this).parent().attr("id");
+        const type = $(this).attr("type") === "1" ? 1 : 0;
+        const elm = $(this).parent().parent();
+        if (elm.hasClass("table-danger")) {
+          elm.removeClass("table-danger").addClass("table-success");
+          $(this).removeClass("btn-success").addClass("btn-danger");
+          ev.target.innerText = "Block";
+        } else {
+          elm.removeClass("table-success").addClass("table-danger");
+          $(this).removeClass("btn-danger").addClass("btn-success");
+          ev.target.innerText = "Unblock";
+        }
+        const data = (await axios.post("/api/updatetype", { domain: `${domain}`, type: type })).data.data;
+        alert(`${data.domain} has been ${data.type}`);
+      });
+    }, i + Math.round(Math.random() * 27) + 1000);
+
+    // Block or Unblock ad script
   });
 });

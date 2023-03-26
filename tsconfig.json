@@ -1,18 +1,16 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "module": "esnext",
-    "moduleResolution": "node",
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
     "allowSyntheticDefaultImports": true,
-    "lib": ["esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
     "isolatedModules": true,
     "incremental": false,
-    "outDir": "./build/",
+    "outDir": "./build/"
   },
   "buildOptions": { "verbose": false, "traceResolution": false, "dry": false },
 

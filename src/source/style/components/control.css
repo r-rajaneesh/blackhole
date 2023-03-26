@@ -1,31 +1,42 @@
-
 .ad-control {
-  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   display: grid;
   grid:
     "live-list" 2rem
-    "ad-control" 10rem;
-  background-color: rgba(55, 55, 55, 0.8);
+    "ad-control" 5rem;
+  background-color: rgb(30, 30, 30);
   border-radius: 5px;
-  padding: 20px;
-  height: 100px;
+  padding-top: 20px;
+  height: 120px;
   color: white;
   justify-items: center;
-  margin: 40px;
+  margin-top: 10px;
+  min-width: 10rem;
+  max-width: 18rem;
+  width: max-content;
+  overflow: visible;
 }
 .ad-control input#ad-control-text {
   color: white;
   height: 2rem;
-  width: 25rem;
   border-width: 0;
   border-radius: 5px;
-  background-color: rgb(55, 55, 55);
+  background-color: rgb(60, 60, 60);
+  padding: 5px;
+  min-width:8rem;
+  width:95%;
+  -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+  -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+  box-sizing: border-box;  
 }
 .ad-control input#ad-control-text:active {
   color: white;
-  border-width: 0;
+  border-width: 0px;
   border-radius: 5px;
   background-color: rgb(78, 78, 78);
+}
+.ad-control input#ad-control-text:target {
+  border-width: 0px;
 }
 .ad-control .buttons {
   background-color: transparent;
@@ -47,5 +58,5 @@
   color: white;
   border-width: 0;
   border-radius: 5px;
-  background-color: rgb(0, 183, 0);
+  background-color: rgb(0, 141, 0);
 }

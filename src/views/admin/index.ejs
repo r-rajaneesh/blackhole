@@ -13,32 +13,107 @@
     <meta name="viewport" content="initial-scale=1, width=device-width" />
     <link rel="icon" href="/favicon.ico" />
 
-    <link rel="stylesheet" type="text/css" href="/style/global.css" />
-    <link rel="stylesheet" type="text/css" href="/style/admin.css" />
+    <!-- <link rel="stylesheet" type="text/css" href="/style/global.css" /> -->
+    <!-- <link rel="stylesheet" type="text/css" href="/style/admin.css" /> -->
     <link rel="stylesheet" type="text/css" href="/style/components/log.css" />
-    <link rel="stylesheet" type="text/css" href="/style/components/control.css" />
+    <link rel="stylesheet" type="text/css" href="/style/bootstrap.min.css" />
+    <!-- <link rel="stylesheet" type="text/css" href="/style/components/control.css" /> -->
+    <!-- <link rel="stylesheet" type="text/css" href="/style/components/live-panel.css" />  -->
+    <style>
+  
+      table > tbody > tr.table-success td {
+        background-color: rgb(0, 200, 57);
+        color: rgb(255, 255, 255);
+      }
+      table > tbody > tr.table-success td button {
+        background-color: rgb(253, 73, 73);
+        color: rgb(255, 255, 255);
+      }
+      table > tbody > tr.table-danger td {
+        background-color: rgb(253, 73, 73);
+        color: rgb(255, 255, 255);
+      }
+      table > tbody > tr.table-danger td button {
+        background-color: rgb(0, 200, 57);
+        color: rgb(255, 255, 255);
+      }
+      table > tbody > tr td:first-child {
+        align-items: flex-start;
+      }
+    </style>
+    <script type="text/javascript" src="/javascript/socket.io.js"></script>
+    <script type="text/javascript">
+      const socket = io("ws://127.0.0.1:80");
+      socket.on("page-reload", () => {
+        document.location.reload();
+      });
+    </script>
   </head>
   <body>
-    <layout class="controls">
-      <!--  -->
-      <%- include("../!components/admin/log.ejs") %>
-      <!--  -->
-      <%- include("../!components/admin/control.ejs") %>
-      <!--  -->
-      <!-- <div class="sticky"><button id="go-up">Go Up</button></div> -->
-      <!--  -->
-    </layout>
+    <div class="container text-center mt-3 ms-2">
+      <!-- Logging -->
+      <div class="row">
+        <div class="col-8 table-responsive">
+          <table class="table table-active" id="log">
+            <thead class="table-dark">
+              <tr>
+                <th class="rounded-1">Time</th>
+                <th class="rounded-1">Domain</th>
+                <th class="rounded-1">Class</th>
+                <th class="rounded-1">Type</th>
+                <th class="rounded-1">State</th>
+              </tr>
+            </thead>
+            <tbody class="table-group-divider" id="logs"></tbody>
+          </table>
+        </div>
+
+        <!-- Updates -->
+        <div class="col">
+          <div class="bg-dark bg-opacity-75 text-white rounded-1">
+            <h3>Stats</h3>
+            <div class="flex-column">
+              <!-- Allowed -->
+              <div class="bg-dark mb-2 rounded">
+                <span>Total Allowed</span>
+                <span id="total-allowed" class="bg-success rounded-1">0</span>
+              </div>
+
+              <!-- Blocked -->
+              <div class="bg-dark mb-2 rounded">
+                <span>Total Blocked</span>
+                <span id="total-blocked" class="bg-danger rounded-1">0</span>
+              </div>
+
+              <!-- Total -->
+              <div class="bg-dark mb-2 rounded">
+                <span>Total Queries</span>
+                <span id="total-queries" class="bg-secondary rounded-1">0</span>
+              </div>
+              <!--  -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Contol Panel -->
+        <div class="col">
+          <div class="bg-dark rounded-1 p-1">
+            <form id="ad-control" class="ad-control">
+              <input class="form-control wm-50 w-5 bg-dark-subtle" placeholder="ads-microsoft.com" id="ad-control-text" name="control-text" />
+              <div class="btn-group">
+                <button class="btn btn-danger">Block</button>
+                <button class="btn btn-success">Unblock</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
-  <!-- <script>
-    document.getElementById("go-up").addEventListener("click", (ev) => {
-      ev.preventDefault();
-      document.body.scrollTop = 0; // For Safari
-      document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
-    });
-  </script> -->
-  <script type="text/javascript" src="/javascript/socket.io.js"></script>
-  <script type="text/javascript" src="/javascript/jquery.min.js"></script>
+  <script type="text/javascript" src="/javascript/jquery.js"></script>
   <script type="text/javascript" src="/javascript/axios.min.js"></script>
+  <script type="text/javascript" src="/javascript/react.development.js"></script>
   <script type="text/javascript" src="/javascript/components/log.js"></script>
   <script type="text/javascript" src="/javascript/components/control.js"></script>
+  <script type="text/javascript" src="/javascript/components/live-panel.js"></script>
 </html>

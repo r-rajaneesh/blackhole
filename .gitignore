@@ -15,3 +15,5 @@ vite.config.ts.timestamp-*
 package-lock.json
 *.csv
 *.sqlite
+*.zip
+/logs

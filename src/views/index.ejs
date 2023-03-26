@@ -12,8 +12,12 @@
     <meta name="author" content="Rajaneesh R" />
     <meta name="viewport" content="initial-scale=1, width=device-width" />
     <link rel="icon" href="/favicon.ico" />
+    <!-- Styles -->
+    <link rel="stylesheet" type="text/css" href="/style/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/style/global.css" />
+    <!-- Javascript -->
     <script type="text/javascript" src="/javascript/socket.io.js"></script>
-    <script>
+    <script type="text/javascript">
       const socket = io("ws://127.0.0.1:80");
       socket.on("page-reload", () => {
         document.location.reload();
@@ -21,27 +25,10 @@
     </script>
   </head>
   <body>
-    <!-- <header><%- include('!components/time') %></header> -->
-    <div>Drop your file here <input type="file" id="drop" /></div>
-    <script>
-      const dropContainer = document.getElementById("drop");
-      dropContainer.ondragover = dropContainer.ondragenter = function (evt) {
-        evt.preventDefault();
-      };
-
-      dropContainer.ondrop = function (evt) {
-        let fileInput
-        // pretty simple -- but not for IE :(
-        fileInput.files = evt.dataTransfer.files;
-
-        // If you want to use some of the dropped files
-        const dT = new DataTransfer();
-        dT.items.add(evt.dataTransfer.files[0]);
-        dT.items.add(evt.dataTransfer.files[3]);
-        fileInput.files = dT.files;
-        console.log(fileInput, dT);
-        evt.preventDefault();
-      };
-    </script>
+    <div class="container-sm">100% wide until small breakpoint</div>
+    <div class="container-md">100% wide until medium breakpoint</div>
+    <div class="container-lg">100% wide until large breakpoint</div>
+    <div class="container-xl">100% wide until extra large breakpoint</div>
+    <div class="container-xxl">100% wide until extra extra large breakpoint</div>
   </body>
 </html>

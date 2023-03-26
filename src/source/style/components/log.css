@@ -1,84 +1,84 @@
-.log {
+#log {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   border-radius: 10px;
-  margin: 15px;
-  padding: 5px;
   color: white;
-  /* width: max-content; */
+  /* background-color: rgb(30, 30, 30); */
   word-wrap: break-word;
-  max-width: 20rem;
-  background-color: rgb(109, 109, 109);
 }
-.log thead tr {
+#log thead tr {
+  text-align: center;
   padding: 15px;
   margin: 15px;
   text-align: left;
   border-color: black;
   border-radius: 5px;
-  background-color: blueviolet;
 }
-.log thead tr th {
+
+#log thead tr th {
+  text-align: center;
   border-radius: 5px;
   padding: 15px;
   margin: 15px;
   background-color: rgb(69, 69, 69);
 }
-.log thead tr th :first-of-type {
+/* #log thead tr th :first-of-type {
   width: 30rem;
-}
-.log tbody tr {
-  animation-name: adelement;
-  animation-duration: 5s;
-  animation-timing-function: ease;
-  animation-delay: 2s;
-  animation-iteration-count: infinite;
-  animation-direction: alternate;
+} */
+
+#log tbody tr {
   padding: 105px;
   margin: 15px;
   border-color: black;
   border-radius: 5px;
-  background-color: rgb(43, 43, 43);
+  animation: adelement 1s 1s 0.25s;
+  transition: ease;
+  word-wrap: break-word;
 }
-.log tbody tr :not(:first-child) {
+@keyframes adelement {
+  from {
+    transform: translateX(-250px);
+  }
+  to {
+    transform: translateX(0px);
+  }
+}
+#log tbody tr :not(:first-child) {
   text-align: center;
 }
-.log tbody tr.blocked td {
+#log tbody tr.blocked td {
   border-radius: 5px;
   padding: 15px;
   background-color: rgb(253, 73, 73);
   color: rgb(255, 255, 255);
 }
-.log tbody tr.blocked button {
+#log tbody tr.blocked button {
   color: white;
-  background-color: rgb(0, 200, 57);
+  background-color: rgb(0, 140, 40);
   border-radius: 5px;
   border-width: 0px;
-  padding: 5px;
-  width: max-content + 0.5rem;
+  content: "Unblock";
 }
-.log tbody tr.allowed td {
+#log tbody tr.allowed td {
   border-radius: 2px;
   padding: 15px;
   background-color: rgb(0, 200, 57);
   color: rgb(255, 255, 255);
 }
-.log tbody tr.allowed button {
+#log tbody tr.allowed button {
   color: white;
   background-color: rgb(253, 73, 73);
   border-radius: 5px;
   border-width: 0px;
-  padding: 5px;
-  width: max-content + 0.5rem;
+  content: "Block";
 }
-.log tbody tr.question td {
+#log tbody tr.question td {
   border-radius: 5px;
   padding: 15px;
   background-color: rgb(53, 53, 53);
   color: rgb(255, 255, 255);
 }
-.log tbody tr td {
+#log tbody tr td {
   border-radius: 5px;
   padding: 15px;
+  word-wrap: break-word;
 }
-
-/*# sourceMappingURL=log.css.map */
