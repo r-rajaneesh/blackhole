@@ -1,10 +1,12 @@
 import express from "express";
 import sql from "../database/db.js";
+import fs from "fs-extra";
 import axios from "axios";
+import { io } from "../server.js";
 const router = express.Router();
 router.use(express.json());
 interface typeadsList {
-  type: number;
+  type: "allowed" | "blocked";
   domain: string;
   redirect: string;
 }
@@ -16,7 +18,7 @@ router.get("/fetch", async (req, res) => {
     console.log(error);
   }
 });
-router.post("/updatetype", async (req, res) => {
+router.patch("/updatetype", async (req, res) => {
   try {
     let body: any;
     try {
@@ -45,7 +47,7 @@ router.post("/blockone", async (req, res) => {
       body = req.body;
     }
     const adsList: typeadsList[] = [];
-    adsList.push({ domain: body.domain, type: 0, redirect: "0.0.0.0" });
+    adsList.push({ domain: body.domain, type: "blocked", redirect: "0.0.0.0" });
     const insertMany = sql.transaction((data: any) => {
       for (const record of data) {
         try {
@@ -62,6 +64,7 @@ router.post("/blockone", async (req, res) => {
     res.status(400).json({ message: "FALIED", statusCode: 400, data: undefined });
   }
 });
+/* Block domains from a file */
 router.post("/block", async (req, res) => {
   try {
     //   sql.prepare(`CREATE TABLE IF NOT EXISTS gravity (type integer primarykey, domain text unique)`).run();
@@ -73,25 +76,8 @@ router.post("/block", async (req, res) => {
     } catch (e) {
       body = req.body;
     }
-    const adsList: typeadsList[] = [];
-
-    const adsfile = (await axios.get(body.domain)).data;
-    const ads: string[] = adsfile.split("\n").filter((line: string) => !line.startsWith("#"));
-    ads.forEach((ad) => {
-      const query = ad
-        .split(" ")
-        .filter((v) => v !== "\r")
-        .filter((v) => v !== "")
-        .map((v) => {
-          if (v.endsWith("\r")) v = v.replace("\r", "");
-          return v;
-        });
-      if (!query.length) return;
-      let domain;
-      if (query.length > 1) domain = query[1];
-      else domain = query[0];
-      if (domain !== ("" || undefined || null)) adsList.push({ type: body.type, domain: domain, redirect: body.type === 1 ? `${body.redirect}` : "0.0.0.0" });
-    });
+    const adsList: typeadsList[] =     getDomains([body.domain], body.type)
+    
     const insertMany = sql.transaction((data: any) => {
       for (const record of data) {
         try {
@@ -118,7 +104,9 @@ router.delete("/delete", async (req, res) => {
 });
 router.delete("/reset", async (req, res) => {
   try {
-    sql.prepare(`CREATE TABLE IF NOT EXISTS gravity (type INTEGER PRIMARYKEY, domain TEXT UNIQUE, redirect text DEFAULT "0.0.0.0")`).run();
+    io.emit("state", false);
+    sql.prepare(`DROP TABLE gravity`).run();
+    sql.prepare(`CREATE TABLE IF NOT EXISTS gravity (type INTEGER PRIMARYKEY NOT NULL, domain TEXT UNIQUE NOT NULL, redirect text DEFAULT "0.0.0.0")`).run();
     sql.prepare(`DELETE FROM gravity`).run();
     const adLists = [
       "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts",
@@ -136,6 +124,9 @@ router.delete("/reset", async (req, res) => {
       "https://v.firebog.net/hosts/Easyprivacy.txt",
       "https://raw.githubusercontent.com/x0uid/SpotifyAdBlock/master/SpotifyBlocklist.txt",
       "https://gist.githubusercontent.com/Gaunah/5a439af3858ab568ec3418355d84d000/raw/dbe2c895cbe9101b2a3ee59791c13f095e4eed00/SpotifyAdList",
+      "https://malware-filter.gitlab.io/malware-filter/urlhaus-filter-domains.txt",
+      "https://malware-filter.gitlab.io/malware-filter/urlhaus-filter-agh.txt",
+      "https://malware-filter.gitlab.io/malware-filter/urlhaus-filter-hosts.txt",
     ];
     const db = sql.prepare(`INSERT INTO gravity (type, domain, redirect) VALUES (@type, @domain, @redirect)`);
     const insertMany = sql.transaction((data: any) => {
@@ -146,34 +137,42 @@ router.delete("/reset", async (req, res) => {
       }
     });
 
-    const adsList: typeadsList[] = [];
-    adLists.forEach(async (adlist, i) => {
-      const adsfile = (await axios.get(adlist)).data;
-      const ads = adsfile.split("\n").filter((line: string) => !line.startsWith("#"));
-      ads.forEach(async (ad: string) => {
-        const query = ad
-          .split(" ")
-          .filter((v: string) => v !== "\r")
-          .filter((v: string) => v !== "")
-          .map((v: string) => {
-            if (v.endsWith("\r")) v = v.replace("\r", "");
-            return v;
-          });
-        if (!query.length) return;
-        let domain;
-        if (query.length > 1) domain = query[1];
-        else domain = query[0];
-        adsList.push({ type: 0, domain: domain, redirect: "0.0.0.0" });
-      });
-    });
+    const adsList: typeadsList[] = getDomains(adLists, "blocked");
+
     setTimeout(async () => {
       insertMany(adsList);
       res.status(200).json({ message: "SUCCESS", status: 200, data: undefined });
+      io.emit("state", true);
     }, 10000);
   } catch (error) {
     console.log(error);
     res.status(400).json({ message: "ERROR", status: 400, data: undefined });
+    io.emit("state", true);
   }
 });
 
+const getDomains = function (adLists: string[], type: "blocked" | "allowed" = "blocked"): typeadsList[] {
+  const adsdomain: { redirect: string; domain: string; type: "allowed" | "blocked" }[] = [];
+  adLists.forEach(async (adlist) => {
+    const { data: list } = await axios({ url: adlist, method: "GET" });
+    // const list = fs.readFileSync(adlist).toString();
+    const ads = list
+      .split("\n")
+      .map((value: string) => value.replace("\r", "").trim())
+      .filter((value: string) => {
+        if (value.startsWith("#")) return;
+        return value;
+      });
+    ads.forEach((ad: string) => {
+      const splitad = ad.split(" ");
+      const redirect: string = splitad[splitad.findIndex((v) => v === "0.0.0.0")] ?? "0.0.0.0";
+      const domains: RegExpMatchArray | null = splitad[splitad.findIndex((v) => v !== "0.0.0.0")].match(/((\w+\.)(?!\/))+\w+/gm);
+      if (!domains || !domains.length) return;
+      domains.forEach((domain: string) => {
+        adsdomain.push({ domain: domain, redirect: redirect, type: type });
+      });
+    });
+  });
+  return adsdomain;
+};
 export default router;

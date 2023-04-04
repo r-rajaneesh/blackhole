@@ -1,8 +1,8 @@
 import sql from "../database/db.js";
 /* Handle Process Exit */
-export default async function (adsBlocked: number) {
+export default async function (ads: { blocked: number; allowed: number }) {
   function updateBlockedAds() {
-    sql.prepare(`UPDATE counter SET count = (count + ?)`).run(adsBlocked);
+    sql.prepare(`UPDATE counter SET blocked = (?), allowed = (?)`).run(ads.blocked, ads.allowed);
   }
   process.prependListener("beforeExit", (...args) => {
     console.log(args);

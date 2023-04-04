@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" data-bs-theme="light">
   <head>
     <title>Blackhole</title>
     <meta name="title" content="Blackhole" />
@@ -13,14 +13,13 @@
     <meta name="viewport" content="initial-scale=1, width=device-width" />
     <link rel="icon" href="/favicon.ico" />
 
-    <!-- <link rel="stylesheet" type="text/css" href="/style/global.css" /> -->
+    <link rel="stylesheet" type="text/css" href="/style/global.css" />
     <!-- <link rel="stylesheet" type="text/css" href="/style/admin.css" /> -->
     <link rel="stylesheet" type="text/css" href="/style/components/log.css" />
-    <link rel="stylesheet" type="text/css" href="/style/bootstrap.min.css" />
+    <!-- <link rel="stylesheet" type="text/css" href="/style/bootstrap.min.css" /> -->
     <!-- <link rel="stylesheet" type="text/css" href="/style/components/control.css" /> -->
     <!-- <link rel="stylesheet" type="text/css" href="/style/components/live-panel.css" />  -->
     <style>
-  
       table > tbody > tr.table-success td {
         background-color: rgb(0, 200, 57);
         color: rgb(255, 255, 255);
@@ -50,10 +49,24 @@
     </script>
   </head>
   <body>
-    <div class="container text-center mt-3 ms-2">
-      <!-- Logging -->
+    <div class="container text-center mt-3 ms-1">
       <div class="row">
-        <div class="col-8 table-responsive">
+        <!-- Logging -->
+        <div class="col-8 table-responsive mw-75">
+          <div class="form-group">
+            <!--		Show Numbers Of Rows 		-->
+            <select class="form-control" name="state" id="maxRows">
+              <option value="500">Show ALL Rows</option>
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+              <option value="20">20</option>
+              <option value="50">50</option>
+              <option value="70">70</option>
+              <option value="100">100</option>
+            </select>
+          </div>
+          <!-- Table -->
           <table class="table table-active" id="log">
             <thead class="table-dark">
               <tr>
@@ -66,6 +79,20 @@
             </thead>
             <tbody class="table-group-divider" id="logs"></tbody>
           </table>
+          <!--		Start Pagination -->
+          <div class="pagination-container">
+            <nav>
+              <ul class="pagination">
+                <li data-page="prev">
+                  <span> < <span class="sr-only"></span></span>
+                </li>
+                <!--	Here the JS Function Will Add the Rows -->
+                <li data-page="next" id="prev">
+                  <span> > <span class="sr-only"></span></span>
+                </li>
+              </ul>
+            </nav>
+          </div>
         </div>
 
         <!-- Updates -->
@@ -97,9 +124,9 @@
 
         <!-- Contol Panel -->
         <div class="col">
-          <div class="bg-dark rounded-1 p-1">
+          <div class="rounded-1 p-1">
             <form id="ad-control" class="ad-control">
-              <input class="form-control wm-50 w-5 bg-dark-subtle" placeholder="ads-microsoft.com" id="ad-control-text" name="control-text" />
+              <input class="form-control wm-50 w-5" placeholder="ads-microsoft.com" id="ad-control-text" name="control-text" />
               <div class="btn-group">
                 <button class="btn btn-danger">Block</button>
                 <button class="btn btn-success">Unblock</button>
@@ -107,13 +134,30 @@
             </form>
           </div>
         </div>
+        <div class="col">
+          <button class="btn btn-danger" id="reset-gravity">Reset gravity</button>
+        </div>
       </div>
     </div>
   </body>
+
+  <script type="text/javascript" src="/javascript/global.js"></script>
   <script type="text/javascript" src="/javascript/jquery.js"></script>
+  <script type="text/javascript" src="/javascript/jquery-ui.min.js"></script>
   <script type="text/javascript" src="/javascript/axios.min.js"></script>
   <script type="text/javascript" src="/javascript/react.development.js"></script>
   <script type="text/javascript" src="/javascript/components/log.js"></script>
   <script type="text/javascript" src="/javascript/components/control.js"></script>
   <script type="text/javascript" src="/javascript/components/live-panel.js"></script>
+  <script>
+    document.getElementById("reset-gravity").addEventListener("click", (ev) => {
+      ev.preventDefault();
+      console.log("RESETTING gravity");
+      axios.delete("/api/reset");
+    });
+    // $(document).ready(function () {
+    //   $("#log").DataTable();
+    //   $(".dataTables_length").addClass("bs-select");
+    // });
+  </script>
 </html>

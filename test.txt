@@ -1,0 +1,151 @@
+0.0.0.0 00573.lap.detroitdragway.com
+0.0.0.0 017c1.asset.tradingvein.xyz
+0.0.0.0 02coverlab.com
+0.0.0.0 0447e.signing.unitynotarypublic.com
+0.0.0.0 044d730.netsolhost.com
+0.0.0.0 08b67.asset.tradingvein.xyz
+0.0.0.0 08c16.asset.tradingvein.xyz
+0.0.0.0 09100.samples.muzikcitysound.com
+0.0.0.0 09532.samples.muzikcitysound.com
+0.0.0.0 0b.htb
+0.0.0.0 0d94f.language.sebtomato.com
+0.0.0.0 0e118.language.sebtomato.com
+0.0.0.0 0e1b4.asset.tradingvein.xyz
+0.0.0.0 0e607.favor.thehouseplantblog.com
+0.0.0.0 0f891.asset.tradingvein.xyz
+0.0.0.0 0fd9a.decision.alshafipdk.com
+0.0.0.0 0following.com
+0.0.0.0 0xy.link
+0.0.0.0 10239.asset.tradingvein.xyz
+0.0.0.0 10a44.samples.muzikcitysound.com
+0.0.0.0 11starmarketing.com
+0.0.0.0 121studies.com
+0.0.0.0 1337x.ind.in
+0.0.0.0 137.216.176.34.bc.googleusercontent.com
+0.0.0.0 140pl.us
+00573.lap.detroitdragway.com
+017c1.asset.tradingvein.xyz
+02coverlab.com
+0447e.signing.unitynotarypublic.com
+044d730.netsolhost.com
+08b67.asset.tradingvein.xyz
+08c16.asset.tradingvein.xyz
+09100.samples.muzikcitysound.com
+09532.samples.muzikcitysound.com
+0b.htb
+0d94f.language.sebtomato.com
+0e118.language.sebtomato.com
+0e1b4.asset.tradingvein.xyz
+0e607.favor.thehouseplantblog.com
+0f891.asset.tradingvein.xyz
+0fd9a.decision.alshafipdk.com
+0following.com
+0xy.link
+1.0.218.230
+1.10.133.41
+1.10.146.175
+1.10.147.64
+1.10.255.22
+||0following.com^
+||0xy.link^
+||1.0.218.230^
+||1.10.133.41^
+||1.10.146.175^
+||1.10.147.64^
+||1.10.255.22^
+||1.116.115.169^
+-ad-300x600-
+-ad-336x280-
+-ad-458x80.
+-ad-banner-
+-ad-bottom-
+-ad-button-
+-ad-choices.
+-ad-code/
+-ad-codes_
+-ad-column-
+-ad-content/
+-ad-cube.
+-ad-data/
+-ad-home.
+-ad-horizontal.
+-ad-iframe/
+-ad-large.
+-Ad-Large_
+-ad-left.
+-ad-loading.
+-ad-manager/$~stylesheet
+-ad-map/
+-ad-marker.
+-ad-random/
+-ad-reload.
+-ad-reload/
+-ad-resize-
+-ad-right.
+-ad-rotator-
+-ad-rotators/
+-ad-server/
+-ad-sidebar-
+-ad-sidebar.
+-ad-strip.
+-ad-switcher.
+-ad-tags.
+-ad-text_
+-ad-tile.
+-ad-top.
+-ad-unit.
+-ad-unit/
+-ad-util-
+-ad-util.
+-ad-utility-
+-ad-vertical-
+-ad-zone.
+-ad.jpg.pagespeed.
+-ad.jpg?
+-ad.php?
+-ad/dist/
+-ad/embed.
+-ad/iframe/
+-ad/main.
+-ad/source/
+-ad_banner-
+-adap.$domain=~l-adap.org
+-adbanner.
+-adbox-
+-adfliction.
+-adfliction/
+-adimage-
+-adloader-
+-adnow.$domain=~zappistore.com
+-ads-banner.
+-ads-bottom.
+-ads-management/
+-ads-manager/$domain=~wordpress.org
+-ads-plugin/
+-ads-right.
+-ads.gif
+-ads.php?
+-ads/assets/
+-adsense2.
+-adserver/
+-adskin.
+-adslots.
+-adsonar.
+-adspace.$domain=~metaverse-adspace.com
+-advertise.$domain=~ads.com|~i-advertise.net|~mb-advertise.gr
+-advertise/
+-advertisement_
+-advertising/assets/
+-advertising/vast/
+-advertising_
+-advertisment-
+-advertorial.
+-adverts.min.
+-adwords.$domain=~consultant-adwords.com|~consultant-adwords.fr|~expert-adwords.com|~freelance-adwords.com|~freelance-adwords.fr
+-article-ad-
+-article-ad.
+-article-ads-
+-assets/ads.$~script
+-auto-ads-
+-banner-ad-
+github-dot-dot.com

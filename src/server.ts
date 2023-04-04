@@ -12,17 +12,21 @@ import sql from "./database/db.js";
 import url from "url";
 import axios from "axios";
 import exit from "./handlers/exit.js";
+
+sql.prepare(`CREATE TABLE IF NOT EXISTS gravity (type INTEGER PRIMARYKEY, domain TEXT UNIQUE, redirect text DEFAULT "0.0.0.0")`).run();
+sql.prepare(`CREATE TABLE IF NOT EXISTS counter (allowed INTEGER, blocked INTEGER)`).run();
+if (!sql.prepare(`SELECT * FROM counter`).all().length) sql.prepare(`INSERT INTO counter (allowed, blocked) VALUES (?, ?)`).run(0, 0);
+let ads = sql.prepare(`SELECT * FROM counter`).get();
 let dnsQueries = {
-  blocked: 0,
-  allowed: 0,
+  blocked: ads.blocked,
+  allowed: ads.allowed,
 };
-exit(dnsQueries.blocked);
+let state = true;
+
+exit(dnsQueries);
 setInterval(() => {
   io.emit("updates", { dnsQueries });
 }, 1000 * 5);
-
-sql.prepare(`CREATE TABLE IF NOT EXISTS gravity (type INTEGER PRIMARYKEY, domain TEXT UNIQUE, redirect text DEFAULT "0.0.0.0")`).run();
-sql.prepare(`CREATE TABLE IF NOT EXISTS counter (count INTEGER PRIMARY KEY)`).run();
 
 const __dirname = p.dirname(url.fileURLToPath(import.meta.url));
 const { Packet } = dns2;
@@ -31,12 +35,16 @@ const app = express();
 const server = http.createServer(app);
 const io = new socket.Server();
 io.attach(server);
+io.on("state", (currstate) => {
+  state = currstate;
+});
 
 // * DNS Initialiser
 const dns = dns2.createServer({
   udp: true,
   tcp: true,
   handle: async (request, send, rinfo) => {
+    if (!state) return;
     const response = Packet.createResponseFromRequest(request);
 
     const question: any = request.questions[0];
@@ -46,6 +54,7 @@ const dns = dns2.createServer({
     function logDNSrequest(responseAnswers: any) {
       const date = new Date();
       [...new Set(responseAnswers)].forEach((ans: any) => {
+        // console.log(ans);
         fs.ensureFileSync(`./logs/${date.getUTCFullYear()}-${date.getUTCMonth()}-${date.getUTCDay()}-${date.getUTCHours()}.log`);
         fs.appendFileSync(
           `./logs/${date.getUTCFullYear()}-${date.getUTCMonth()}-${date.getUTCDay()}-${date.getUTCHours()}.log`,
@@ -78,6 +87,7 @@ const dns = dns2.createServer({
           res.answers.forEach(async (ans) => {
             // console.log(ad);
             if (ad?.type === 0) {
+              console.log("AHHHHHH", ad);
               return blockDomain(ad);
             } else {
               ans.allowed = true;
@@ -170,10 +180,12 @@ dns.on("close", () => {
 });
 
 /* Start the servers */
-server.listen(80, "127.0.0.1", async () => {
+server.listen(80, "0.0.0.0", async () => {
   dns.listen({ tcp: 53, udp: 53 });
   console.log("Server running on http://127.0.0.1");
   if (!sql.prepare(`SELECT * FROM gravity`).all().length) {
     await axios({ method: "delete", url: "http://127.0.0.1:80/reset" });
   }
 });
+
+export { io };

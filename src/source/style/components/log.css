@@ -30,7 +30,8 @@
   margin: 15px;
   border-color: black;
   border-radius: 5px;
-  animation: adelement 1s 1s 0.25s;
+  animation: adelement 1s;
+  animation-delay: 0.5s;
   transition: ease;
   word-wrap: break-word;
 }
@@ -42,8 +43,11 @@
     transform: translateX(0px);
   }
 }
-#log tbody tr :not(:first-child) {
-  text-align: center;
+#log tbody tr td:first-child {
+  text-align: left;
+}
+#log tbody tr td:nth-child(2) {
+  text-align: start;
 }
 #log tbody tr.blocked td {
   border-radius: 5px;
@@ -81,4 +85,7 @@
   border-radius: 5px;
   padding: 15px;
   word-wrap: break-word;
+}
+.pagination li:hover {
+  cursor: pointer;
 }
