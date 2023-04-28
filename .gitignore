@@ -17,3 +17,7 @@ package-lock.json
 *.sqlite
 *.zip
 /logs
+test.js
+test.txt
+tmp.js
+out.json

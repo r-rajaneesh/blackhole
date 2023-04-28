@@ -10,7 +10,8 @@
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
     "incremental": false,
-    "outDir": "./build/"
+    "outDir": "./build/",
+    "baseUrl": ".",
   },
   "buildOptions": { "verbose": false, "traceResolution": false, "dry": false },
 
